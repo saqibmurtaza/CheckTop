@@ -1,0 +1,19 @@
+# --- Root Level ---
+.DS_Store
+*.log
+.env
+.env.local
+
+# --- Frontend (Next.js) ---
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/build/
+frontend/.vercel/
+
+# --- Python (for your tree.py or future backend) ---
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/

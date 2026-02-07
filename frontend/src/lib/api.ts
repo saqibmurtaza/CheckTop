@@ -1,5 +1,5 @@
 // src/lib/api.ts - EXACT VERSION FOR YOUR page.tsx
-const LOCAL_AGENT_URL = "http://localhost:5000";
+const LOCAL_AGENT_URL = "http://localhost:9797";
 
 /**
  * Triggers the local agent to start diagnostics.

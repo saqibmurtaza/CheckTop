@@ -167,67 +167,26 @@ export default function LandingPage() {
   const [prettyReport, setPrettyReport] = useState<string>("");
   const [diagnosticResults, setDiagnosticResults] = useState<any>(null);
 
-  // const handleStartDiagnostics = async () => {
-  //   setStatus("running");
-  //   setError(null);
-  //   setReport(null);
-  //   setPrettyReport("");
-  //   setDiagnosticResults(null);
-
-  //   try {
-  //     // 1. Kick off the agent
-  //     await triggerDiagnostics();
-
-  //     // 2. Poll for the report
-  //     const finalReport = await fetchReportWithRetry();
-  //     setReport(finalReport);
-      
-  //     setStatus("completed");
-  //   } catch (err: any) {
-  //     setError(err.message || "Failed to complete diagnostics");
-  //     setStatus("failed");
-  //   }
-  // };
   const handleStartDiagnostics = async () => {
   setStatus("running");
   setError(null);
-  setReport(null);
-  setPrettyReport("");
-  setDiagnosticResults(null);
 
   try {
-    // 0. Preflight: check if agent is running
-    const healthCheck = await fetch("http://localhost:9797/health", {
-      method: "GET",
-    });
+    // 1. Preflight: Check if agent is alive
+    const healthCheck = await fetch("http://localhost:9797/health");
+    if (!healthCheck.ok) throw new Error("Agent not responding.");
 
-    if (!healthCheck.ok) {
-      throw new Error(
-        "CheckTop Agent is installed but not running. Please start the agent and try again."
-      );
-    }
-
-    // 1. Kick off the agent
+    // 2. Kick off the agent (Uses your lib/api.ts)
     await triggerDiagnostics();
 
-    // 2. Poll for the report
+    // 3. Poll for the report
+    // This will now work because Agent has /last-report and Port is 9797
     const finalReport = await fetchReportWithRetry();
     setReport(finalReport);
 
     setStatus("completed");
   } catch (err: any) {
-    // Distinguish agent-not-installed vs other failures
-    if (
-      err.message?.includes("Failed to fetch") ||
-      err.message?.includes("NetworkError")
-    ) {
-      setError(
-        "CheckTop Diagnostic Agent is not detected. Please install and run the agent first."
-      );
-    } else {
-      setError(err.message || "Failed to complete diagnostics.");
-    }
-
+    setError("CheckTop Diagnostic Agent is not detected. Please install and run the agent first.");
     setStatus("failed");
   }
 };

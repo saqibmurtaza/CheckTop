@@ -226,7 +226,11 @@ export default function LandingPage() {
           </div>
           
           <button
-            onClick={handleStartDiagnostics}
+            // onClick={handleStartDiagnostics}
+            onClick={() => {
+              alert("Please install the CheckTop Diagnostic Agent first.");
+            }}
+
             disabled={status === "running"}
             style={{
               background: "#ff6b35",
@@ -447,6 +451,64 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Download Agent Section */}
+<section style={{ padding: "80px 20px", background: "#ffffff" }}>
+  <div style={{ maxWidth: "900px", margin: "0 auto", textAlign: "center" }}>
+    <h2 style={{ fontSize: "2.5rem", fontWeight: 700, marginBottom: "20px", color: "#1a73e8" }}>
+      Download & Run Diagnostics
+    </h2>
+
+    <p style={{ fontSize: "1.2rem", color: "#5f6368", maxWidth: "700px", margin: "0 auto 30px" }}>
+      To accurately check your laptop’s health, CheckTop uses a secure local diagnostic agent.
+      The agent runs directly on your laptop and performs all checks locally.
+    </p>
+
+    {/* Trust bullets */}
+    <div style={{ maxWidth: "500px", margin: "0 auto 40px", textAlign: "left" }}>
+      {[
+        "Runs only on your laptop",
+        "No remote access or screen control",
+        "No personal files or browsing data collected",
+        "Runs only when you click Start Laptop Check"
+      ].map((item, index) => (
+        <div key={index} style={{ marginBottom: "12px", paddingLeft: "28px", position: "relative" }}>
+          <span style={{
+            position: "absolute",
+            left: 0,
+            color: "#34a853",
+            fontWeight: "bold"
+          }}>
+            ✓
+          </span>
+          {item}
+        </div>
+      ))}
+    </div>
+
+    {/* Download Button */}
+    <a
+      href="/downloads/CheckTop-Diagnostic-Agent.exe"
+      style={{
+        display: "inline-block",
+        background: "#1a73e8",
+        color: "white",
+        padding: "16px 36px",
+        borderRadius: "8px",
+        fontSize: "1.1rem",
+        fontWeight: 600,
+        textDecoration: "none"
+      }}
+    >
+      Download CheckTop Diagnostic Agent (Windows)
+    </a>
+
+    <div style={{ marginTop: "12px", fontSize: "0.9rem", color: "#80868b" }}>
+      Windows 10 / 11 · One-time install · Takes less than 1 minute
+    </div>
+  </div>
+</section>
+
+
       {/* Tool Description Section */}
       <section style={{ padding: "80px 20px" }}>
         <div style={{ maxWidth: "900px", margin: "0 auto" }}>
@@ -467,7 +529,7 @@ export default function LandingPage() {
             </p>
             
             <div style={{ textAlign: "left", maxWidth: "500px", margin: "0 auto" }}>
-              {["No software installation required", "No data stored on our servers", "Diagnostics run locally on your device", "Designed for non-technical users"].map((item, index) => (
+              {["One-time secure agent installation required", "No data stored on our servers", "Diagnostics run locally on your device", "Designed for non-technical users"].map((item, index) => (
                 <div key={index} style={{ marginBottom: "16px", paddingLeft: "32px", position: "relative" }}>
                   <div style={{ position: "absolute", left: 0, color: "#34a853", fontWeight: "bold", fontSize: "1.2rem" }}>✓</div>
                   <span>{item}</span>
@@ -476,7 +538,7 @@ export default function LandingPage() {
             </div>
             
             <div style={{ fontSize: "1.5rem", fontWeight: 600, textAlign: "center", color: "#1a73e8", marginTop: "40px", paddingTop: "30px", borderTop: "2px solid #f1f3f4" }}>
-              No software. No installs. No technical knowledge required.
+              One-time install. No technical knowledge required.
             </div>
           </div>
         </div>
@@ -617,3 +679,4 @@ export default function LandingPage() {
     </div>
   );
 }
+

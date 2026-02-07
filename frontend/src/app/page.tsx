@@ -167,45 +167,70 @@ export default function LandingPage() {
   const [prettyReport, setPrettyReport] = useState<string>("");
   const [diagnosticResults, setDiagnosticResults] = useState<any>(null);
 
+  // const handleStartDiagnostics = async () => {
+  //   setStatus("running");
+  //   setError(null);
+  //   setReport(null);
+  //   setPrettyReport("");
+  //   setDiagnosticResults(null);
+
+  //   try {
+  //     // 1. Kick off the agent
+  //     await triggerDiagnostics();
+
+  //     // 2. Poll for the report
+  //     const finalReport = await fetchReportWithRetry();
+  //     setReport(finalReport);
+      
+  //     setStatus("completed");
+  //   } catch (err: any) {
+  //     setError(err.message || "Failed to complete diagnostics");
+  //     setStatus("failed");
+  //   }
+  // };
   const handleStartDiagnostics = async () => {
-    setStatus("running");
-    setError(null);
-    setReport(null);
-    setPrettyReport("");
-    setDiagnosticResults(null);
+  setStatus("running");
+  setError(null);
+  setReport(null);
+  setPrettyReport("");
+  setDiagnosticResults(null);
 
-    try {
-      // 1. Kick off the agent
-      await triggerDiagnostics();
+  try {
+    // 0. Preflight: check if agent is running
+    const healthCheck = await fetch("http://localhost:9797/health", {
+      method: "GET",
+    });
 
-      // 2. Poll for the report
-      const finalReport = await fetchReportWithRetry();
-      setReport(finalReport);
-
-      // 3. Get the pretty text report
-      // try {
-      //   const response = await fetch('http://localhost:5000/simple-report');
-      //   if (response.ok) {
-      //     const result = await response.json();
-      //     if (result.success) {
-      //       if (result.textSummary) {
-      //         setPrettyReport(result.textSummary);
-      //       }
-      //       if (result.data) {
-      //         setDiagnosticResults(result.data);
-      //       }
-      //     }
-      //   }
-      // } catch (parseError) {
-      //   console.log("Could not get parsed report");
-      // }
-
-      setStatus("completed");
-    } catch (err: any) {
-      setError(err.message || "Failed to complete diagnostics");
-      setStatus("failed");
+    if (!healthCheck.ok) {
+      throw new Error(
+        "CheckTop Agent is installed but not running. Please start the agent and try again."
+      );
     }
-  };
+
+    // 1. Kick off the agent
+    await triggerDiagnostics();
+
+    // 2. Poll for the report
+    const finalReport = await fetchReportWithRetry();
+    setReport(finalReport);
+
+    setStatus("completed");
+  } catch (err: any) {
+    // Distinguish agent-not-installed vs other failures
+    if (
+      err.message?.includes("Failed to fetch") ||
+      err.message?.includes("NetworkError")
+    ) {
+      setError(
+        "CheckTop Diagnostic Agent is not detected. Please install and run the agent first."
+      );
+    } else {
+      setError(err.message || "Failed to complete diagnostics.");
+    }
+
+    setStatus("failed");
+  }
+};
 
 
   return (
@@ -226,10 +251,7 @@ export default function LandingPage() {
           </div>
           
           <button
-            // onClick={handleStartDiagnostics}
-            onClick={() => {
-              alert("Please install the CheckTop Diagnostic Agent first.");
-            }}
+            onClick={handleStartDiagnostics}
 
             disabled={status === "running"}
             style={{

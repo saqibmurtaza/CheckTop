@@ -5,26 +5,15 @@ const LOCAL_AGENT_URL = "http://localhost:9797";
  * Triggers the local agent to start diagnostics.
  * Matches agent.js POST /run-diagnostics
  */
-export async function triggerDiagnostics(): Promise<{ 
-  status: string; 
-  message: string;
-}> {
-  try {
-    const response = await fetch(`${LOCAL_AGENT_URL}/run-diagnostics`, { 
-      method: "POST",
-      headers: { "Content-Type": "application/json" }
-    });
-    
-    if (!response.ok) {
-      throw new Error("Failed to trigger local agent. Is the agent running?");
-    }
-    
-    return response.json();
-  } catch (error) {
-    return {
-      status: "ERROR",
-      message: "Make sure the CheckTop Agent is running"
-    };
+
+export async function triggerDiagnostics(): Promise<void> {
+  const response = await fetch(`${LOCAL_AGENT_URL}/run-diagnostics`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" }
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to trigger local agent");
   }
 }
 

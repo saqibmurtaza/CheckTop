@@ -1,4 +1,4 @@
-import AgentStatus from "@/components/AgentStatus";
+import AgentStatus from "@/app/components/AgentStatus";
 
 export default function HomePage() {
   return (

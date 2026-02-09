@@ -31,7 +31,7 @@ export default function LandingPage() {
   } catch (err: any) {
   setError(err?.message || "Diagnostics failed.");
   setStatus("failed");
-};
+  };
 
 
   return (
@@ -329,7 +329,7 @@ export default function LandingPage() {
       Windows 10 / 11 · One-time install · Takes less than 1 minute
     </div>
   </div>
-</section>
+  </section>
 
 
       {/* Tool Description Section */}
@@ -501,5 +501,5 @@ export default function LandingPage() {
       </footer>
     </div>
   );
-}
+}}
 

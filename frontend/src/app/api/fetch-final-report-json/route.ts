@@ -1,40 +1,22 @@
-// import { NextRequest, NextResponse } from "next/server";
-// import { existsSync, readFileSync } from "fs";
-// import { join } from "path";
-// import { homedir } from "os";
+import { NextResponse } from "next/server";
 
-// export async function GET(req: NextRequest) {
-//   const reportPath = join(homedir(), "AppData", "Roaming", "CheckTop Local Agent", "last_report.json");
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_BASE ??
+  "https://checktop-tool.onrender.com";
 
-//   if (!existsSync(reportPath)) {
-//     return NextResponse.json({ error: "Report not ready yet" }, { status: 404 });
-//   }
+export async function GET() {
+  const res = await fetch(`${API_BASE}/api/fetch-final-report-json`, {
+    method: "GET",
+    cache: "no-store",
+  });
 
-//   try {
-//     const report = JSON.parse(readFileSync(reportPath, "utf-8"));
-//     return NextResponse.json(report, { status: 200 });
-//   } catch (err) {
-//     return NextResponse.json({ error: "Failed to read report" }, { status: 500 });
-//   }
-// }
-
-
-import { NextRequest, NextResponse } from "next/server";
-import { existsSync, readFileSync } from "fs";
-import { join } from "path";
-import { homedir } from "os";
-
-export async function GET(req: NextRequest) {
-  const reportPath = join(homedir(), "AppData", "Roaming", "CheckTop Local Agent", "last_report.json");
-
-  if (!existsSync(reportPath)) {
-    return NextResponse.json({ error: "Report not ready yet" }, { status: 404 });
+  if (!res.ok) {
+    return NextResponse.json(
+      { error: "Report not ready" },
+      { status: res.status }
+    );
   }
 
-  try {
-    const report = JSON.parse(readFileSync(reportPath, "utf-8"));
-    return NextResponse.json(report, { status: 200 });
-  } catch (err) {
-    return NextResponse.json({ error: "Failed to read report" }, { status: 500 });
-  }
+  const data = await res.json();
+  return NextResponse.json(data);
 }

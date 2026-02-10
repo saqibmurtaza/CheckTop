@@ -6,8 +6,11 @@ export default function HomePage() {
       <h1>CheckTop</h1>
       <p>Secure Local Diagnostics</p>
 
-      {/* Client-only agent detection */}
       <AgentStatus />
+
+      <button>
+        Run Diagnostics
+      </button>
     </main>
   );
 }

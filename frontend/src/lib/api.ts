@@ -1,41 +1,42 @@
-// src/lib/api.ts - EXACT VERSION FOR YOUR page.tsx
-const LOCAL_AGENT_URL = "http://localhost:9797";
+// src/lib/api.ts — FINAL PRODUCTION VERSION (NO LOCALHOST)
+
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_BASE ??
+  "https://checktop-tool.onrender.com";
 
 /**
- * Triggers the local agent to start diagnostics.
- * Matches agent.js POST /run-diagnostics
+ * Triggers diagnostics via Render backend.
+ * Backend / n8n handles agent invocation.
  */
-
 export async function triggerDiagnostics(): Promise<void> {
-  const response = await fetch(`${LOCAL_AGENT_URL}/run-diagnostics`, {
+  const response = await fetch(`${API_BASE}/api/run-diagnostics`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" }
+    headers: { "Content-Type": "application/json" },
   });
 
   if (!response.ok) {
-    throw new Error("Failed to trigger local agent");
+    throw new Error("Failed to trigger diagnostics");
   }
 }
 
 /**
- * Fetches the local report saved by the agent after execution.
+ * Fetches final merged diagnostic report from backend.
  */
-export async function fetchLocalReport(): Promise<any> {
-  const res = await fetch(`${LOCAL_AGENT_URL}/last-report`, {
+export async function fetchFinalReport(): Promise<any> {
+  const res = await fetch(`${API_BASE}/api/fetch-final-report-json`, {
     method: "GET",
-    cache: "no-store"
+    cache: "no-store",
   });
 
   if (!res.ok) {
-    throw new Error("Report not ready or agent unreachable.");
+    throw new Error("Report not ready");
   }
-  
+
   return res.json();
 }
 
 /**
- * Retries fetching the report. Diagnostics take time (execSync + user input),
- * so we poll until the file is available.
+ * Retries fetching the report until available.
  */
 export async function fetchReportWithRetry(
   retries = 10,
@@ -43,14 +44,12 @@ export async function fetchReportWithRetry(
 ): Promise<any> {
   for (let i = 0; i < retries; i++) {
     try {
-      const data = await fetchLocalReport();
+      const data = await fetchFinalReport();
       if (data) return data;
-    } catch (e) {
-      // Silently wait for next retry
-    }
-    await new Promise(resolve => setTimeout(resolve, delayMs));
+    } catch {}
+    await new Promise((resolve) => setTimeout(resolve, delayMs));
   }
-  throw new Error("Diagnostics timed out or were cancelled.");
+  throw new Error("Diagnostics timed out");
 }
 
 /**
@@ -58,57 +57,27 @@ export async function fetchReportWithRetry(
  */
 export async function downloadReportPdf(reportJson: any) {
   try {
-    // Dynamic import to avoid bundle issues
     const jsPDF = (await import("jspdf")).default;
     const doc = new jsPDF();
-    
+
     doc.setFontSize(16);
     doc.text("CheckTop Diagnostic Report", 10, 20);
-    
+
     doc.setFontSize(10);
     const content = JSON.stringify(reportJson, null, 2);
     const lines = doc.splitTextToSize(content, 180);
-    
+
     doc.text(lines, 10, 30);
     doc.save(`Diagnostic_Report_${reportJson.job_id || "export"}.pdf`);
-  } catch (error) {
-    console.error("PDF generation failed:", error);
-    // Fallback: Create a downloadable text file
-    const blob = new Blob([JSON.stringify(reportJson, null, 2)], { type: 'text/plain' });
+  } catch {
+    const blob = new Blob([JSON.stringify(reportJson, null, 2)], {
+      type: "text/plain",
+    });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
     a.download = `Health_Check_${Date.now()}.txt`;
     a.click();
     URL.revokeObjectURL(url);
-  }
-}
-
-// Export additional functions if needed elsewhere
-export async function getSimpleReport() {
-  try {
-    const res = await fetch(`${LOCAL_AGENT_URL}/simple-report`);
-    if (!res.ok) throw new Error("Report not ready");
-    return res.json();
-  } catch (error) {
-    return {
-      success: false,
-      simpleMessage: "Health check results not available yet"
-    };
-  }
-}
-
-export async function saveReportAsText() {
-  try {
-    const res = await fetch(`${LOCAL_AGENT_URL}/save-report`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" }
-    });
-    return res.json();
-  } catch (error) {
-    return {
-      success: false,
-      message: "Could not save report"
-    };
   }
 }

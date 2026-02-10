@@ -1,21 +1,25 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-const API_BASE =
-  process.env.NEXT_PUBLIC_API_BASE ??
-  "https://checktop-tool.onrender.com";
+export async function POST(req: NextRequest) {
+  try {
+    // Forward the request to the Render backend workflow
+    const backendUrl = `${process.env.NEXT_PUBLIC_API_BASE}/webhook/checktop-agent-command`;
 
-export async function POST() {
-  const res = await fetch(`${API_BASE}/api/run-diagnostics`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-  });
+    const body = await req.json();
 
-  if (!res.ok) {
-    return NextResponse.json(
-      { success: false },
-      { status: res.status }
-    );
+    const response = await fetch(backendUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${process.env.AGENT_SHARED_SECRET}`
+      },
+      body: JSON.stringify(body)
+    });
+
+    const data = await response.json();
+
+    return NextResponse.json(data, { status: response.status });
+  } catch (err) {
+    return NextResponse.json({ error: "Failed to trigger diagnostics" }, { status: 500 });
   }
-
-  return NextResponse.json({ success: true });
 }

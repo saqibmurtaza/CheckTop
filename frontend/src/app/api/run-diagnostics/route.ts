@@ -1,34 +1,27 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
-export async function OPTIONS() {
-  // Respond to preflight
-  return new NextResponse(null, {
-    status: 200,
+export async function POST() {
+  // Ensure we have the secret, otherwise throw a clear error
+  const sharedSecret = process.env.NEXT_PUBLIC_SHARED_SECRET || "";
+  const apiBase = process.env.NEXT_PUBLIC_API_BASE;
+
+  if (!apiBase) {
+    return NextResponse.json({ error: "API Base URL is not configured" }, { status: 500 });
+  }
+
+  const res = await fetch(`${apiBase}/webhook/checktop-agent-command`, {
+    method: "POST",
     headers: {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type, Authorization"
-    }
+      "Content-Type": "application/json",
+      // Adding the '!' or a fallback tells TS this won't be undefined
+      "X-Shared-Secret": sharedSecret 
+    },
+    body: JSON.stringify({ action: "RUN_DIAGNOSTIC" })
   });
-}
 
-export async function POST(req: NextRequest) {
-  try {
-    const backendUrl = `${process.env.NEXT_PUBLIC_API_BASE}/webhook/checktop-agent-command`;
-    const body = await req.json();
-
-    const response = await fetch(backendUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.AGENT_SHARED_SECRET}`
-      },
-      body: JSON.stringify(body)
-    });
-
-    const data = await response.json();
-    return NextResponse.json(data, { status: response.status });
-  } catch (err) {
+  if (!res.ok) {
     return NextResponse.json({ error: "Failed to trigger diagnostics" }, { status: 500 });
   }
+
+  return NextResponse.json({ success: true });
 }

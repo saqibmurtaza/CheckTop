@@ -1,22 +1,29 @@
 import { NextResponse } from "next/server";
 
-const API_BASE =
-  process.env.NEXT_PUBLIC_API_BASE ??
-  "https://checktop-tool.onrender.com";
-
 export async function GET() {
-  const res = await fetch(`${API_BASE}/api/fetch-final-report-json`, {
-    method: "GET",
-    cache: "no-store",
-  });
+  // Fallback to empty strings to satisfy TypeScript's 'string' requirement
+  const apiBase = process.env.NEXT_PUBLIC_API_BASE || "";
+  const sharedSecret = process.env.NEXT_PUBLIC_SHARED_SECRET || "";
 
-  if (!res.ok) {
-    return NextResponse.json(
-      { error: "Report not ready" },
-      { status: res.status }
-    );
+  if (!apiBase) {
+    return NextResponse.json({ error: "Configuration error: API Base missing" }, { status: 500 });
   }
 
-  const data = await res.json();
-  return NextResponse.json(data);
+  try {
+    const res = await fetch(`${apiBase}/webhook/checktop-agent-result`, {
+      method: "GET",
+      headers: { 
+        "X-Shared-Secret": sharedSecret 
+      }
+    });
+
+    if (!res.ok) {
+      return NextResponse.json({ error: "Report not ready" }, { status: 404 });
+    }
+
+    const data = await res.json();
+    return NextResponse.json(data);
+  } catch (error) {
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+  }
 }

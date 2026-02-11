@@ -1,27 +1,26 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function POST() {
-  // Ensure we have the secret, otherwise throw a clear error
-  const sharedSecret = process.env.NEXT_PUBLIC_SHARED_SECRET || "";
-  const apiBase = process.env.NEXT_PUBLIC_API_BASE;
+export async function POST(req: NextRequest) {
+  try {
+    const body = await req.json();
 
-  if (!apiBase) {
-    return NextResponse.json({ error: "API Base URL is not configured" }, { status: 500 });
+    // Forward to n8n webhook that triggers the local agent
+    const webhookUrl = process.env.AGENT_COMMAND_ENDPOINT;
+    if (!webhookUrl) throw new Error("AGENT_COMMAND_ENDPOINT not set");
+
+    const res = await fetch(`${process.env.RENDER_PUBLIC_BASE_URL}${webhookUrl}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-shared-secret": process.env.AGENT_SHARED_SECRET || ""
+      },
+      body: JSON.stringify(body)
+    });
+
+    if (!res.ok) throw new Error("Failed to trigger n8n workflow");
+
+    return NextResponse.json({ success: true, message: "Diagnostics triggered" });
+  } catch (err: any) {
+    return NextResponse.json({ success: false, message: err.message }, { status: 500 });
   }
-
-  const res = await fetch(`${apiBase}/webhook/checktop-agent-command`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      // Adding the '!' or a fallback tells TS this won't be undefined
-      "X-Shared-Secret": sharedSecret 
-    },
-    body: JSON.stringify({ action: "RUN_DIAGNOSTIC" })
-  });
-
-  if (!res.ok) {
-    return NextResponse.json({ error: "Failed to trigger diagnostics" }, { status: 500 });
-  }
-
-  return NextResponse.json({ success: true });
 }

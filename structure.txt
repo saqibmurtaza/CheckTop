@@ -18,18 +18,11 @@ CheckTop/
 │   ├── src/
 │   │   ├── app/
 │   │   │   ├── api/
-│   │   │   │   ├── fetch-final-report-json/
+│   │   │   │   ├── ping/
 │   │   │   │   │   ├── route.ts
-│   │   │   ├── components/
-│   │   │   │   ├── AgentStatus.tsx
 │   │   │   ├── favicon.ico
 │   │   │   ├── globals.css
 │   │   │   ├── layout.tsx
 │   │   │   ├── page.tsx
-│   │   │   ├── page.txt
-│   │   ├── config/
-│   │   │   ├── env.ts
-│   │   ├── lib/
-│   │   │   ├── api.ts
 │   ├── tsconfig.json
 ├── tree.py

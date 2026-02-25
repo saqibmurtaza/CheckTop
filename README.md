@@ -1,4 +1,3 @@
-```markdown
 # CheckTop Laptop Diagnostic Agent
 
 ## How to Use
@@ -33,4 +32,3 @@
 ## Support
 
 Visit: [https://checktop-frontend.onrender.com/](https://checktop-frontend.onrender.com/)
-```

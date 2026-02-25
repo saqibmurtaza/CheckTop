@@ -41,7 +41,7 @@ export default function LandingPage() {
 
             {/* Download Button */}
             <a
-              href="/downloads/CheckTop-Diagnostic-Agent.exe"
+              href="https://github.com/saqibmurtaza/CheckTop_Diagnostic/releases/tag/v1.0.0"
               style={{
                 display: "inline-block",
                 background: "#1a73e8",

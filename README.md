@@ -2,9 +2,10 @@
 
 ## How to Use
 
-1. Double-click `run-diagnostics.bat`
-2. Wait for the diagnostics to complete (approximately 2 minutes)
-3. Your report will be saved to:
+1. Download the CheckTop Agent
+2. Double-click `run-diagnostics.bat`
+3. Wait for the diagnostics to complete (approximately 2-5 minutes)
+4. Your report will be saved to:
    ```
    %APPDATA%\CheckTop Local Agent\last_report_human.json
    ```

@@ -36,7 +36,7 @@ export default function LandingPage() {
           }}>
             <div style={{ fontSize: "64px", marginBottom: "20px" }}>🖥️</div>
             <p style={{ fontSize: "1.3rem", color: "#202124", maxWidth: "600px", margin: "0 auto 30px", fontWeight: 500 }}>
-              Download the CheckTop Agent, run it, and get your complete laptop health report in 2 minutes
+              Download the CheckTop Agent, run it, and get your complete laptop health report in 2-5 minutes
             </p>
 
             {/* Download Button */}
